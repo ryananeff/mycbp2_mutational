@@ -1,0 +1,16 @@
+#!/bin/bash
+
+echo "#!/bin/bash"
+echo "#BSUB -J MYCBP2.$1.RNA.star"
+echo "#BSUB -W 48:00
+#BSUB -n 12
+#BSUB -q premium
+#BSUB -P acc_zhangb03a"
+echo "#BSUB -o /sc/orga/projects/zhangb03a/neffr01/MycBP2_data/processed/logs/star/MYCBP2.$1.log.out"
+echo "#BSUB -e /sc/orga/projects/zhangb03a/neffr01/MycBP2_data/processed/logs/star/MYCBP2.$1.log.err"
+echo "#BSUB -u ryan.neff@icahn.mssm.edu
+#BSUB -R rusage[mem=4012]
+#BSUB -R span[hosts=1]
+#BSUB -L /bin/bash"
+
+echo "/hpc/users/neffr01/zhang_neffr01/mycbp2_alignment_code/star_mycbp2.sh $1 $2 $3"

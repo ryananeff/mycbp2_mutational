@@ -1,0 +1,4 @@
+path	parent	name	synapseStore	contentType	used	executed	activityName	activityDescription
+/mnt/md0/mycbp2_code/jupyter/mycbp2_tcga_analysis.ipynb	syn25651468	mycbp2_tcga_analysis.ipynb	True	application/octet-stream				
+/mnt/md0/mycbp2_code/jupyter/MYCBP2_rnaseq_experiment.ipynb	syn25651468	MYCBP2_rnaseq_experiment.ipynb	True	application/octet-stream				
+/mnt/md0/mycbp2_code/jupyter/mycbp2_tcga_analysis_and_survival.ipynb	syn25651468	mycbp2_tcga_analysis_and_survival.ipynb	True	application/octet-stream				

@@ -1,0 +1,7 @@
+path	parent	name	synapseStore	contentType	used	executed	activityName	activityDescription
+/mnt/md0/mycbp2_code/alignment/featureCounts.lsf	syn25651457	featureCounts.lsf	True	video/x-la-asf				
+/mnt/md0/mycbp2_code/alignment/featureCounts_mycbp2.lsf	syn25651457	featureCounts_mycbp2.lsf	True	video/x-la-asf				
+/mnt/md0/mycbp2_code/alignment/featureCounts_mycbp2.sh	syn25651457	featureCounts_mycbp2.sh	True	text/x-sh				
+/mnt/md0/mycbp2_code/alignment/star.lsf	syn25651457	star.lsf	True	video/x-la-asf				
+/mnt/md0/mycbp2_code/alignment/star_mycbp2.lsf	syn25651457	star_mycbp2.lsf	True	video/x-la-asf				
+/mnt/md0/mycbp2_code/alignment/star_mycbp2.sh	syn25651457	star_mycbp2.sh	True	text/x-sh				

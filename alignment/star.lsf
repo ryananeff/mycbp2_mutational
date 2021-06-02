@@ -1,0 +1,96 @@
+#!/bin/bash
+#BSUB -J BM_36_515.8d05d10f81d6fc8a387fde2c78844fc3.RNA.star
+#BSUB -W 48:00
+#BSUB -n 16
+#BSUB -q premium
+#BSUB -P acc_PBG
+#BSUB -o /sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0/star/log.out
+#BSUB -e /sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0/star/log.err
+#BSUB -u hardik.shah@mssm.edu
+#BSUB -R rusage[mem=4012]
+#BSUB -R span[hosts=1]
+#BSUB -L /bin/bash
+
+announce_program() {
+    # $1 == name of program
+    echo "=============================="
+    echo "$1 RUNNING"
+    echo "=============================="
+    echo
+}
+
+test_exit_status() {
+    # $1 == name of program
+    # $2 == program exit status (a.k.a. $?)
+    if [ $2 -ne 0 ]
+    then
+        echo "=============================="
+        echo "$1 FAILED with exit status $2" | tee /dev/stderr
+        echo "=============================="
+        echo
+        exit 42
+    else
+        echo "=============================="
+        echo "$1 SUCCEEDED with exit status $2"
+        echo "=============================="
+        echo
+    fi
+}
+module purge all
+module load star/2.4.0g1
+module load samtools
+module load java
+module load picard
+cd /sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0
+#    | samtools view -bS - 
+
+# Run star to generate accepted_hits.bam file
+announce_program star
+STAR \
+    --chimSegmentMin 15  \
+    --chimJunctionOverhangMin 15 \
+    --outSAMstrandField intronMotif \
+    --genomeDir /sc/orga/projects/PBG/REFERENCES/hg19/star/2.4.0d/Homo_sapiens.GRCh37.ensembl70.overhang75bp \
+    --sjdbGTFfile /sc/orga/projects/PBG/REFERENCES/hg19/ensembl/Homo_sapiens.GRCh37.70.processed.gtf \
+    --runThreadN 10 \
+    --outReadsUnmapped Fastx \
+    --outStd SAM \
+    --outSAMmode Full \
+    --outFileNamePrefix /sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0/star/accepted_hits \
+    --readFilesCommand zcat \
+    --readFilesIn /sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Raw/RNA.IlluminaHiSeq2500.RiboZero/BM_36_515_ATGTCA_L007_R1_001.C6C6GANXX.fastq.gz,/sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Raw/RNA.IlluminaHiSeq2500.RiboZero/BM_36_515_ATGTCA_L008_R1_001.C6C6GANXX.fastq.gz \
+     \
+    1> /sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0/star/accepted_hits.sam
+#test_exit_status star $?
+
+# Move tophat output to ``bams`` directory
+mkdir -p /sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0/bams
+cd /sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0/bams
+mv ../star/accepted_hits.sam BM_36_515.accepted_hits.sam
+cd -
+
+# Sort and index the bam by coordinate, using karyotypic order
+announce_program AddOrReplaceReadGroups.jar
+java -jar /sc/orga/projects/PBG/scripts/picard/AddOrReplaceReadGroups.jar \
+    I=/sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0/bams/BM_36_515.accepted_hits.sam \
+    O=/sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0/bams/BM_36_515.accepted_hits.sort.coord.bam \
+    SO=coordinate \
+    ID=BM_36_515 \
+    LB=BM_36_515 \
+    PL=ILLUMINA \
+    PU=HiSeq2500 \
+    SM=BM_36_515 \
+    CN=MSSM \
+    DS=rnaseq
+test_exit_status AddOrReplaceReadGroups.jar $?
+announce_program BuildBamIndex.jar
+java -jar $PICARD_HOME/BuildBamIndex.jar \
+    I=/sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0/bams/BM_36_515.accepted_hits.sort.coord.bam
+test_exit_status BuildBamIndex.jar $?
+announce_program RemoveOldBAM
+    rm /sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0/bams/BM_36_515.accepted_hits.sam
+test_exit_status RemoveOldBAM $?
+cp /sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0/bams/BM_36_515.accepted_hits.sort.coord.bai /sc/orga/scratch/shahh06/GCF/outgoing/ProductionQC/QC_S151.B648_AMP-AD.SE.RNASeqRibozero.RAPiD.Human/BM_36_515/Processed/RAPiD.2_0_0/bams/BM_36_515.accepted_hits.sort.coord.bam.bai
+
+# Run other programs that use the sorted bam files (optional)
+
