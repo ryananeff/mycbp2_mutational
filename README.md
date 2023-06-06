@@ -1,5 +1,7 @@
 ## MycBP2 in DNA-damage induced apoptosis experiments
 
+[![DOI](https://zenodo.org/badge/373218599.svg)](https://zenodo.org/badge/latestdoi/373218599)
+
 #### Authors: *Ryan A. Neff, Almudena Bosch-Gutierrez , Yifei Sun* , Igor Katsyv , Won-min Song, Minghui Wang, Martin J. Walsh, and Bin Zhang
 *Contributed equally to the work*
 
